@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { FcGoogle } from "react-icons/fc";
 
 export function LoginForm({
   className,
@@ -38,12 +39,26 @@ export function LoginForm({
         password,
       });
       if (error) throw error;
-      // Update this route to redirect to an authenticated route. The user already has an active session.
       router.push("/protected");
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "An error occurred");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    const supabase = createClient();
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback?next=/protected`,
+        },
+      });
+      if (error) throw error;
+    } catch (error: unknown) {
+      setError(error instanceof Error ? error.message : "OAuth login failed");
     }
   };
 
@@ -93,6 +108,23 @@ export function LoginForm({
                 {isLoading ? "Logging in..." : "Login"}
               </Button>
             </div>
+
+            <div className="my-6 flex items-center">
+              <div className="h-px flex-1 bg-muted" />
+              <span className="mx-4 text-sm text-muted-foreground">or</span>
+              <div className="h-px flex-1 bg-muted" />
+            </div>
+
+            <Button
+              type="button"
+              variant="outline"
+              className="flex items-center justify-center gap-2 w-full"
+              onClick={handleGoogleLogin}
+            >
+              <FcGoogle className="h-5 w-5" />
+              Continue with Google
+            </Button>
+
             <div className="mt-4 text-center text-sm">
               Don&apos;t have an account?{" "}
               <Link
