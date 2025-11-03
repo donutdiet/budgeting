@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { FcGoogle } from "react-icons/fc";
 
 export function SignUpForm({
   className,
@@ -53,6 +54,22 @@ export function SignUpForm({
       setError(error instanceof Error ? error.message : "An error occurred");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleGoogleSignUp = async () => {
+    const supabase = createClient();
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          // This must point to your server-side callback route
+          redirectTo: `${window.location.origin}/auth/callback?next=/protected`,
+        },
+      });
+      if (error) throw error;
+    } catch (error: unknown) {
+      setError(error instanceof Error ? error.message : "OAuth login failed");
     }
   };
 
@@ -106,6 +123,24 @@ export function SignUpForm({
                 {isLoading ? "Creating an account..." : "Sign up"}
               </Button>
             </div>
+
+            <div className="my-6 flex items-center">
+              <div className="h-px flex-1 bg-muted" />
+              <span className="mx-4 text-sm text-muted-foreground">or</span>
+              <div className="h-px flex-1 bg-muted" />
+            </div>
+
+            <Button
+              type="button"
+              variant="outline"
+              className="flex items-center justify-center gap-2 w-full"
+              onClick={handleGoogleSignUp}
+              disabled={isLoading} // Disable while email signup is pending
+            >
+              <FcGoogle className="h-5 w-5" />
+              Sign up with Google
+            </Button>
+
             <div className="mt-4 text-center text-sm">
               Already have an account?{" "}
               <Link href="/auth/login" className="underline underline-offset-4">
