@@ -45,7 +45,7 @@ export function SignUpForm({
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/protected`,
+          emailRedirectTo: `${window.location.origin}/home`,
         },
       });
       if (error) throw error;
@@ -64,7 +64,7 @@ export function SignUpForm({
         provider: "google",
         options: {
           // This must point to your server-side callback route
-          redirectTo: `${window.location.origin}/auth/callback?next=/protected`,
+          redirectTo: `${window.location.origin}/auth/callback?next=/home`,
         },
       });
       if (error) throw error;
